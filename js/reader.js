@@ -17,12 +17,24 @@ const Reader = {
   getWPM: null,
 
   /**
+   * Remove citation patterns like [1], [2], [123] and URLs from text
+   * @param {string} text - Raw input text
+   * @returns {string} Text with citations and URLs removed
+   */
+  removeCitations(text) {
+    return text
+      .replace(/\[\d+\]/g, '')                          // Remove [1], [2], [123] etc.
+      .replace(/https?:\/\/[^\s]+/g, '')                // Remove http:// and https:// URLs
+      .replace(/www\.[^\s]+/g, '');                     // Remove www. URLs
+  },
+
+  /**
    * Parse input text into an array of words
    * @param {string} text - Raw input text
    * @returns {string[]} Array of words
    */
   parseText(text) {
-    return text
+    return this.removeCitations(text)
       .trim()
       .split(/\s+/)
       .filter(word => word.length > 0);
@@ -59,7 +71,8 @@ const Reader = {
   },
 
   /**
-   * Calculate the Optimal Recognition Point (middle letter index)
+   * Calculate the Optimal Recognition Point (Spritz-style, first third of word)
+   * Based on research: ORP is slightly left of center for fastest word recognition
    * @param {string} word - The word to analyze
    * @returns {number} Index of the letter to highlight
    */
@@ -68,11 +81,12 @@ const Reader = {
     const cleanWord = word.replace(/[^\w]/g, '');
     const length = cleanWord.length;
     
-    if (length <= 1) return 0;
-    if (length <= 3) return 1;
-    
-    // Middle index (or just before middle for even length)
-    return Math.floor((length - 1) / 2);
+    // Spritz-style ORP: positioned at roughly first third of word
+    if (length <= 1) return 0;       // 1 letter: highlight it
+    if (length <= 5) return 1;       // 2-5 letters: 2nd letter (index 1)
+    if (length <= 9) return 2;       // 6-9 letters: 3rd letter (index 2)
+    if (length <= 13) return 3;      // 10-13 letters: 4th letter (index 3)
+    return 4;                        // 14+ letters: 5th letter (index 4)
   },
 
   /**
