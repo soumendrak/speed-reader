@@ -357,7 +357,7 @@ body {
 .word-display__highlight {
   flex: 0 0 auto;
   text-align: center;
-  color: var(--color-highlight);
+  color: #DC2626;
 }
 
 .word-display__after {
