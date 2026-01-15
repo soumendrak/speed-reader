@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Speed Reader - A lightweight RSVP speed reading app">
+  <meta name="theme-color" content="#0066CC">
+  <title>Speed Reader</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="header__title">Speed Reader</h1>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="theme-toggle__icon theme-toggle__icon--sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="theme-toggle__icon theme-toggle__icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Input View -->
+      <section class="input-view" id="inputView">
+        <div class="input-view__container">
+          <label for="textInput" class="input-view__label">Paste your text below</label>
+          <textarea 
+            class="input-view__textarea" 
+            id="textInput" 
+            placeholder="Paste or type your text here to start speed reading..."
+            autofocus
+          ></textarea>
+          <div class="input-view__footer">
+            <span class="input-view__word-count" id="wordCount">0 words</span>
+            <div class="input-view__actions">
+              <button class="btn btn--secondary" id="pasteBtn">Paste Clipboard</button>
+              <button class="btn btn--secondary" id="clearBtn">Clear</button>
+              <button class="btn btn--primary" id="startBtn" disabled>Start Reading</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reader View -->
+      <section class="reader-view hidden" id="readerView">
+        <!-- Stats Bar -->
+        <div class="reader-view__stats">
+          <span class="reader-view__word-progress" id="wordProgress">0 of 0 words</span>
+          <span class="reader-view__time-remaining" id="timeRemaining">0:00 remaining</span>
+        </div>
+
+        <!-- Word Display -->
+        <div class="reader-view__display">
+          <div class="word-display" id="wordDisplay">
+            <span class="word-display__before"></span>
+            <span class="word-display__highlight"></span>
+            <span class="word-display__after"></span>
+          </div>
+          <div class="fixation-point hidden" id="fixationPoint"></div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-bar__fill" id="progressFill"></div>
+          </div>
+          <div class="progress-bar__labels">
+            <span id="progressPercent">0%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        <!-- Playback Controls -->
+        <div class="controls">
+          <button class="control-btn" id="restartBtn" aria-label="Restart" title="Restart (R)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 4v6h6"></path>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+          </button>
+          <button class="control-btn control-btn--primary" id="playPauseBtn" aria-label="Play" title="Play/Pause (Space)">
+            <svg class="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <svg class="pause-icon hidden" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          </button>
+          <button class="control-btn" id="endBtn" aria-label="Go to end" title="Go to end (E)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 4 15 12 5 20 5 4"></polygon>
+              <line x1="19" y1="5" x2="19" y2="19"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel">
+          <!-- WPM Slider -->
+          <div class="setting">
+            <label class="setting__label" for="wpmSlider">Reading Speed</label>
+            <div class="setting__slider-container">
+              <input 
+                type="range" 
+                class="setting__slider" 
+                id="wpmSlider" 
+                min="100" 
+                max="1000" 
+                step="25" 
+                value="300"
+              >
+              <span class="setting__value" id="wpmValue">300 WPM</span>
+            </div>
+          </div>
+
+          <!-- Font Size -->
+          <div class="setting">
+            <label class="setting__label">Font Size</label>
+            <div class="setting__options" id="fontSizeOptions">
+              <button class="setting__option" data-size="small">S</button>
+              <button class="setting__option setting__option--active" data-size="medium">M</button>
+              <button class="setting__option" data-size="large">L</button>
+              <button class="setting__option" data-size="xlarge">XL</button>
+            </div>
+          </div>
+
+          <!-- Toggles Row -->
+          <div class="setting setting--row">
+            <div class="setting__toggle-group">
+              <label class="setting__label" for="highlightToggle">Highlight Focus</label>
+              <button class="toggle" id="highlightToggle" aria-pressed="true">
+                <span class="toggle__slider"></span>
+              </button>
+            </div>
+            <div class="setting__toggle-group">
+              <label class="setting__label" for="fixationToggle">Fixation Point</label>
+              <button class="toggle" id="fixationToggle" aria-pressed="false">
+                <span class="toggle__slider"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Back Button -->
+        <button class="btn btn--secondary reader-view__back" id="backBtn" title="Back to Input (Esc)">← Back to Input</button>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/reader.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((registration) => {
+            console.log('SW registered:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('SW registration failed:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
