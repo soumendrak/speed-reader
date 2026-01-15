@@ -71,7 +71,7 @@ The ORP is the letter in a word where the eye naturally focuses for fastest reco
 | Criterion | Implementation |
 |-----------|---------------|
 | Color contrast | Minimum 4.5:1 for normal text, 3:1 for large text |
-| Color-blind friendly | Blue-based highlight (avoids red-green) |
+| Color-blind friendly | Red highlight (#DC2626) for ORP letter |
 | Keyboard navigation | Full app control via keyboard |
 | Focus indicators | Visible focus rings on all interactive elements |
 | Reduced motion | Respect `prefers-reduced-motion` |
@@ -103,6 +103,7 @@ The ORP is the letter in a word where the eye naturally focuses for fastest reco
 - Placeholder text with instructions
 - Character/word count display
 - Clear button to reset input
+- **Paste Clipboard button** to paste from clipboard with one click
 - Auto-focus on page load
 
 #### Mobile Behavior
@@ -147,7 +148,8 @@ function getMiddleIndex(word) {
 - Word centered horizontally
 - Fixed vertical position (eye doesn't move)
 - Large, readable font (configurable)
-- High contrast between highlight and regular text
+- High contrast between highlight (red) and regular text
+- **Punctuation stripped from display** (timing delays still apply)
 - Optional: Fixation point marker (vertical line showing center)
 
 ### FR-3: Punctuation Delay
@@ -193,11 +195,12 @@ Words ending with punctuation receive extended display time:
 └─────────────────────────────────────┘
 ```
 
-| Control | Action | Keyboard Shortcut |
-|---------|--------|-------------------|
-| Restart | Go to first word | `Home` or `R` |
-| Play/Pause | Toggle playback | `Space` |
-| End | Go to last word | `End` or `E` |
+| Control | Action | Keyboard Shortcut | Tooltip on Hover |
+|---------|--------|-------------------|------------------|
+| Restart | Go to first word | `Home` or `R` | "Restart (R)" |
+| Play/Pause | Toggle playback | `Space` | "Play/Pause (Space)" |
+| End | Go to last word | `End` or `E` | "Go to end (E)" |
+| Back | Return to input | `Escape` | "Back to Input (Esc)" |
 
 ### FR-6: Speed Control (WPM)
 
@@ -225,6 +228,10 @@ function getBaseDelay(wpm) {
 // 600 WPM → 100ms per word
 // 150 WPM → 400ms per word
 ```
+
+#### Real-Time Speed Changes
+- WPM slider changes take effect **immediately during playback**
+- Uses a `getWPM` callback to fetch current speed for each word
 
 ### FR-7: Additional Settings
 
@@ -332,7 +339,7 @@ const AppState = {
 | Surface | Light Gray | `#F5F5F7` | - |
 | Primary Text | Dark Gray | `#1D1D1F` | 16:1 on white |
 | Secondary Text | Medium Gray | `#6E6E73` | 4.6:1 on white |
-| Highlight Letter | Blue | `#0066CC` | 4.5:1 on white |
+| Highlight Letter | Red | `#DC2626` | 4.5:1 on white |
 | Progress Bar | Blue | `#0066CC` | - |
 | Border | Light Gray | `#D2D2D7` | - |
 | Focus Ring | Blue | `#0066CC` | - |
@@ -345,17 +352,16 @@ const AppState = {
 | Surface | Dark Gray | `#2C2C2E` | - |
 | Primary Text | White | `#F5F5F7` | 12:1 on bg |
 | Secondary Text | Light Gray | `#A1A1A6` | 5.3:1 on bg |
-| Highlight Letter | Cyan | `#00B4D8` | 6.8:1 on bg |
+| Highlight Letter | Red | `#DC2626` | 4.5:1 on bg |
 | Progress Bar | Cyan | `#00B4D8` | - |
 | Border | Dark Gray | `#3A3A3C` | - |
 | Focus Ring | Cyan | `#00B4D8` | - |
 
-#### Why Blue/Cyan?
+#### Why Red?
 
-- **Deuteranopia** (green-blind): Can distinguish blue
-- **Protanopia** (red-blind): Can distinguish blue
-- **Tritanopia** (blue-blind): Rare (~0.01%), cyan still visible
-- High contrast against both light and dark backgrounds
+- High visibility and attention-grabbing for the focal point
+- Strong contrast against both light and dark backgrounds
+- Universally recognized as an emphasis color
 
 ### Typography
 
@@ -424,7 +430,7 @@ const AppState = {
 ## Implementation Milestones
 
 ### Milestone 1: Project Setup & Core HTML Structure
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 1 hour
 
 #### Tasks
@@ -448,7 +454,7 @@ const AppState = {
 ---
 
 ### Milestone 2: Input View UI
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 1.5 hours
 
 #### Tasks
@@ -471,7 +477,7 @@ const AppState = {
 ---
 
 ### Milestone 3: Reader View UI
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 2 hours
 
 #### Tasks
@@ -494,7 +500,7 @@ const AppState = {
 ---
 
 ### Milestone 4: RSVP Engine Core
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 3 hours
 
 #### Tasks
@@ -519,7 +525,7 @@ const AppState = {
 ---
 
 ### Milestone 5: Playback Controls & Navigation
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 2 hours
 
 #### Tasks
@@ -543,7 +549,7 @@ const AppState = {
 ---
 
 ### Milestone 6: Settings & Preferences
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 2 hours
 
 #### Tasks
@@ -569,7 +575,7 @@ const AppState = {
 ---
 
 ### Milestone 7: Theme System (Light/Dark Mode)
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 1.5 hours
 
 #### Tasks
@@ -594,7 +600,7 @@ const AppState = {
 ---
 
 ### Milestone 8: PWA Setup
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 2 hours
 
 #### Tasks
@@ -619,7 +625,7 @@ const AppState = {
 ---
 
 ### Milestone 9: Final Polish & Testing
-**Status**: 🔴 Not Started  
+**Status**: ✅ Complete  
 **Estimated Time**: 2 hours
 
 #### Tasks
@@ -653,11 +659,15 @@ speed-reader/
 │   ├── reader.js           # RSVP engine
 │   └── storage.js          # LocalStorage utilities
 ├── icons/
-│   ├── icon-192.png        # PWA icon (192x192)
-│   ├── icon-512.png        # PWA icon (512x512)
+│   ├── icon-192.svg        # PWA icon (192x192)
+│   ├── icon-512.svg        # PWA icon (512x512)
 │   └── favicon.svg         # Favicon
+├── docs/
+│   └── cover.webp          # Screenshot for README
 ├── manifest.json           # PWA manifest
+├── wrangler.jsonc          # Cloudflare Pages deployment config
 ├── sw.js                   # Service worker
+├── .gitignore              # Git ignore file
 ├── AGENTS.md               # This file
 └── README.md               # User documentation
 ```
@@ -714,16 +724,26 @@ function getHighlightIndex(word) {
 
 ```javascript
 /**
- * Render a word with the ORP letter highlighted
+ * Strip punctuation from word for display
+ * @param {string} word - The word to clean
+ * @returns {string} Word with punctuation removed
+ */
+function stripPunctuation(word) {
+  return word.replace(/[^\w]/g, '');
+}
+
+/**
+ * Render a word with the ORP letter highlighted (punctuation stripped)
  * @param {string} word - The word to display
  * @param {HTMLElement} container - The display container
  */
 function renderWord(word, container) {
-  const highlightIndex = getHighlightIndex(word);
+  const cleanWord = stripPunctuation(word);
+  const highlightIndex = getORPIndex(word);
   
-  const before = word.substring(0, highlightIndex);
-  const highlight = word[highlightIndex] || '';
-  const after = word.substring(highlightIndex + 1);
+  const before = cleanWord.substring(0, highlightIndex);
+  const highlight = cleanWord[highlightIndex] || '';
+  const after = cleanWord.substring(highlightIndex + 1);
   
   container.innerHTML = `
     <span class="word-before">${before}</span>
@@ -904,18 +924,22 @@ function formatTime(seconds) {
 ### Requirements for Full PWA Functionality
 
 1. **HTTPS Required**: Service workers require HTTPS
-2. **Recommended Hosting**: 
-   - GitHub Pages (free, HTTPS included)
-   - Netlify (free tier, HTTPS included)
-   - Vercel (free tier, HTTPS included)
+2. **Hosting**: Cloudflare Pages (configured via `wrangler.jsonc`)
 
-### GitHub Pages Deployment
+### Cloudflare Pages Deployment
 
-```bash
-# Push to main branch, then enable GitHub Pages in repo settings
-# Or use gh-pages branch:
-git subtree push --prefix . origin gh-pages
-```
+The app is configured for Cloudflare Pages deployment:
+
+1. Connect GitHub repo to Cloudflare Pages
+2. Build settings:
+   - **Framework preset**: None
+   - **Build command**: `npx wrangler deploy`
+   - **Build output directory**: `./`
+3. Deploy automatically on push to `main` branch
+
+### GitHub Repository
+
+- **URL**: https://github.com/soumendrak/speed-reader
 
 ### Lighthouse Audit Targets
 
@@ -934,6 +958,7 @@ git subtree push --prefix . origin gh-pages
 | Date | Version | Changes |
 |------|---------|---------|
 | 2026-01-15 | 0.1.0 | Initial requirements document |
+| 2026-01-15 | 1.0.0 | Full implementation complete |
 
 ---
 
