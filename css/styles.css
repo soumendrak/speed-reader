@@ -688,3 +688,86 @@ body {
     min-height: 200px;
   }
 }
+
+/* ========================================
+   Bookmarklet Section
+   ======================================== */
+.bookmarklet-section {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.bookmarklet-section__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.bookmarklet-section__icon {
+  color: var(--color-highlight);
+}
+
+.bookmarklet-section__title {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.bookmarklet-section__description {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  line-height: 1.5;
+}
+
+.bookmarklet-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(135deg, var(--color-highlight), #0052a3);
+  color: #FFFFFF;
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  cursor: grab;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.bookmarklet-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.bookmarklet-link:active {
+  cursor: grabbing;
+  transform: translateY(0);
+}
+
+[data-theme="dark"] .bookmarklet-link {
+  background: linear-gradient(135deg, var(--color-highlight), #008fb3);
+}
+
+.bookmarklet-section__hint {
+  margin-top: var(--space-md);
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.bookmarklet-section__hint kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.7rem;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 0 var(--color-border);
+}

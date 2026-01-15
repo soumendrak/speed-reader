@@ -19,6 +19,8 @@ const App = {
     this.initTheme();
     this.bindEvents();
     this.setupReaderCallbacks();
+    this.setupBookmarkletListener();
+    this.generateBookmarklet();
     this.updateWordCount();
   },
 
@@ -67,7 +69,10 @@ const App = {
       fixationToggle: document.getElementById('fixationToggle'),
       
       // Theme
-      themeToggle: document.getElementById('themeToggle')
+      themeToggle: document.getElementById('themeToggle'),
+      
+      // Bookmarklet
+      bookmarkletLink: document.getElementById('bookmarkletLink')
     };
   },
 
@@ -428,6 +433,81 @@ const App = {
         this.showInputView();
         break;
     }
+  },
+
+  /**
+   * Setup listener for bookmarklet postMessage
+   */
+  setupBookmarkletListener() {
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'SPEED_READER_TEXT') {
+        const text = event.data.text;
+        if (text && text.trim()) {
+          // Store text in textarea (for back button functionality)
+          this.elements.textInput.value = text;
+          this.updateWordCount();
+          
+          // Directly start reading - skip input view
+          this.startReadingDirect(text);
+        }
+      }
+    });
+  },
+
+  /**
+   * Start reading directly (used by bookmarklet)
+   * @param {string} text - Text to read
+   */
+  startReadingDirect(text) {
+    if (!text || !text.trim()) return;
+    
+    Reader.init(text);
+    this.showReaderView();
+    
+    // Display first word
+    Reader.displayWordAt(0, this.settings.wpm);
+  },
+
+  /**
+   * Generate bookmarklet code and set href
+   */
+  generateBookmarklet() {
+    const appUrl = window.location.origin + window.location.pathname;
+    
+    // Bookmarklet code - minified for URL
+    // Uses Mozilla Readability from CDN, extracts text, opens app, sends via postMessage
+    const bookmarkletCode = `javascript:(function(){
+      var appUrl='${appUrl}';
+      var s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/@mozilla/readability/Readability.js';
+      s.onload=function(){
+        try{
+          var clone=document.cloneNode(true);
+          var article=new Readability(clone).parse();
+          if(article&&article.textContent){
+            var text=article.textContent.trim();
+            if(text.length>0){
+              var popup=window.open(appUrl,'speedreader');
+              var attempts=0;
+              var sendMessage=function(){
+                attempts++;
+                if(popup&&!popup.closed){
+                  popup.postMessage({type:'SPEED_READER_TEXT',text:text,title:article.title||document.title},'*');
+                  if(attempts<10){setTimeout(sendMessage,500);}
+                }
+              };
+              setTimeout(sendMessage,1000);
+            }else{alert('No readable content found on this page.');}
+          }else{alert('Could not extract content from this page.');}
+        }catch(e){alert('Error: '+e.message);}
+      };
+      s.onerror=function(){alert('Failed to load Readability library.');};
+      document.head.appendChild(s);
+    })();`;
+    
+    // Encode and set href
+    const encoded = bookmarkletCode.replace(/\s+/g, ' ').trim();
+    this.elements.bookmarkletLink.href = encoded;
   }
 };
 
