@@ -444,21 +444,51 @@ const App = {
       // Clear the hash without triggering reload
       history.replaceState(null, '', window.location.pathname);
       
-      // Auto-read from clipboard
-      navigator.clipboard.readText().then(text => {
+      // Show clipboard prompt overlay
+      this.showClipboardPrompt();
+    }
+  },
+
+  /**
+   * Show prompt to read from clipboard (requires user gesture)
+   */
+  showClipboardPrompt() {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'clipboard-prompt-overlay';
+    overlay.innerHTML = `
+      <div class="clipboard-prompt">
+        <h2>Article Ready!</h2>
+        <p>Click the button below to start speed reading the article.</p>
+        <button class="btn btn--primary clipboard-prompt__btn">Start Speed Reading</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    // Handle click - read clipboard with user gesture
+    const btn = overlay.querySelector('.clipboard-prompt__btn');
+    btn.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
         if (text && text.trim()) {
+          // Remove overlay
+          document.body.removeChild(overlay);
+          
           // Store text in textarea (for back button functionality)
           this.elements.textInput.value = text;
           this.updateWordCount();
           
-          // Directly start reading - skip input view
+          // Directly start reading
           this.startReadingDirect(text);
+        } else {
+          alert('No text found in clipboard. Please try again.');
         }
-      }).catch(err => {
+      } catch (err) {
         console.error('Failed to read clipboard:', err);
-        // Fallback: user can manually paste
-      });
-    }
+        alert('Could not read clipboard. Please paste the text manually.');
+        document.body.removeChild(overlay);
+      }
+    });
   },
 
   /**
