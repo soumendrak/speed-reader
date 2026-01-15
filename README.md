@@ -2,6 +2,8 @@
 
 A lightweight RSVP (Rapid Serial Visual Presentation) speed reading Progressive Web App built with vanilla HTML, CSS, and JavaScript.
 
+![Speed Reader Screenshot](docs/cover.webp)
+
 ## Features
 
 - **RSVP Speed Reading**: Words displayed one at a time at a fixed focal point
