@@ -86,17 +86,27 @@ const Reader = {
   },
 
   /**
-   * Split word into parts for display
+   * Strip punctuation from word for display (keep letters only)
+   * @param {string} word - The word to clean
+   * @returns {string} Word with punctuation removed
+   */
+  stripPunctuation(word) {
+    return word.replace(/[^\w]/g, '');
+  },
+
+  /**
+   * Split word into parts for display (punctuation stripped)
    * @param {string} word - The word to split
    * @returns {Object} { before, highlight, after }
    */
   splitWord(word) {
-    const highlightIndex = this.getHighlightIndex(word);
+    const cleanWord = this.stripPunctuation(word);
+    const highlightIndex = this.getORPIndex(word);
     
     return {
-      before: word.substring(0, highlightIndex),
-      highlight: word[highlightIndex] || '',
-      after: word.substring(highlightIndex + 1)
+      before: cleanWord.substring(0, highlightIndex),
+      highlight: cleanWord[highlightIndex] || '',
+      after: cleanWord.substring(highlightIndex + 1)
     };
   },
 
