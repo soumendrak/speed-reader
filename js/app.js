@@ -19,7 +19,7 @@ const App = {
     this.initTheme();
     this.bindEvents();
     this.setupReaderCallbacks();
-    this.setupBookmarkletListener();
+    this.checkBookmarkletData();
     this.generateBookmarklet();
     this.updateWordCount();
   },
@@ -436,12 +436,16 @@ const App = {
   },
 
   /**
-   * Setup listener for bookmarklet postMessage
+   * Check for bookmarklet data on page load
    */
-  setupBookmarkletListener() {
-    window.addEventListener('message', (event) => {
-      if (event.data && event.data.type === 'SPEED_READER_TEXT') {
-        const text = event.data.text;
+  checkBookmarkletData() {
+    // Check if opened via bookmarklet (hash flag)
+    if (window.location.hash === '#speedread') {
+      // Clear the hash without triggering reload
+      history.replaceState(null, '', window.location.pathname);
+      
+      // Auto-read from clipboard
+      navigator.clipboard.readText().then(text => {
         if (text && text.trim()) {
           // Store text in textarea (for back button functionality)
           this.elements.textInput.value = text;
@@ -450,8 +454,11 @@ const App = {
           // Directly start reading - skip input view
           this.startReadingDirect(text);
         }
-      }
-    });
+      }).catch(err => {
+        console.error('Failed to read clipboard:', err);
+        // Fallback: user can manually paste
+      });
+    }
   },
 
   /**
@@ -474,8 +481,12 @@ const App = {
   generateBookmarklet() {
     const appUrl = window.location.origin + window.location.pathname;
     
-    // Bookmarklet code - minified for URL
-    // Uses Mozilla Readability from CDN, extracts text, opens app, sends via postMessage
+    // Bookmarklet code - uses clipboard approach for cross-origin reliability
+    // 1. Load Readability from CDN
+    // 2. Extract text content
+    // 3. Copy text to clipboard
+    // 4. Open app with #speedread hash flag
+    // 5. App auto-reads from clipboard on load
     const bookmarkletCode = `javascript:(function(){
       var appUrl='${appUrl}';
       var s=document.createElement('script');
@@ -487,16 +498,11 @@ const App = {
           if(article&&article.textContent){
             var text=article.textContent.trim();
             if(text.length>0){
-              var popup=window.open(appUrl,'speedreader');
-              var attempts=0;
-              var sendMessage=function(){
-                attempts++;
-                if(popup&&!popup.closed){
-                  popup.postMessage({type:'SPEED_READER_TEXT',text:text,title:article.title||document.title},'*');
-                  if(attempts<10){setTimeout(sendMessage,500);}
-                }
-              };
-              setTimeout(sendMessage,1000);
+              navigator.clipboard.writeText(text).then(function(){
+                window.open(appUrl+'#speedread','_blank');
+              }).catch(function(){
+                alert('Could not copy to clipboard. Please copy the text manually.');
+              });
             }else{alert('No readable content found on this page.');}
           }else{alert('Could not extract content from this page.');}
         }catch(e){alert('Error: '+e.message);}
@@ -506,7 +512,7 @@ const App = {
     })();`;
     
     // Encode and set href
-    const encoded = bookmarkletCode.replace(/\s+/g, ' ').trim();
+    const encoded = bookmarkletCode.replace(/\\s+/g, ' ').trim();
     this.elements.bookmarkletLink.href = encoded;
   }
 };
