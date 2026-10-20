@@ -66,6 +66,10 @@ php -S localhost:8000
 - Safari (latest)
 - Edge (latest)
 
+## Sponsor
+
+If this project helps you, consider [sponsoring my work on GitHub](https://github.com/sponsors/soumendrak). Your support helps fund maintenance, documentation, and continued development.
+
 ## License
 
 MIT
